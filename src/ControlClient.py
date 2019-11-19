@@ -1,23 +1,34 @@
+from lib.Client import Client
 import time
 
-from Protacol import Protacol
+class ControlClient(Client):
+    def getSizeMonitor(self):
+        start = time.time()
+
+        response = self.request({'action': 'getsize'})
+
+        self.logger(f'Get img time: {time.time() - start}')
+        return response 
+
+    def moveTo(self, x, y, s):
+        start = time.time()
+
+        response = self.request({'action': 'moveto',
+            'x': x, 'y': y, 'time': s })
+
+        self.logger(f'Get img time: {time.time() - start}')
+        return response 
 
 
 if __name__ == '__main__':
+    from lib.Protacol import Protacol
+
     protacol = Protacol(10)
+    controlClient = ControlClient('localhost', 4002, protacol)
 
-    while True:
-        start = time.time()
+    sizeMonitor = controlClient.getSizeMonitor()
+    print(sizeMonitor) 
 
-        client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_sock.connect(('127.0.0.1', 4002))
+    moveTo = controlClient.moveTo(100, 100, 10)
+    print(moveTo) 
 
-        protacol.write(client_sock, '<get><img></img></get>')
-        data = protacol.read(client_sock)
-        client_sock.close()
-        print(f'Get img time: {time.time() - start}')
-
-        cv.imshow('Monitor clietn', data)
-        if cv.waitKey(25) & 0xFF == ord('q'):
-            cv.destroyAllWindows()
-            break
