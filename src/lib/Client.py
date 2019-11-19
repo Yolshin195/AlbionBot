@@ -2,8 +2,7 @@ import socket
 
 class Client:
     def __init__(self, host_name, port, protacol, logger=print):
-        self.host_name = host_name
-        self.port = port
+        self.address = (host_name, port)
         self.protacol = protacol
         self.logger = logger
 
@@ -14,7 +13,7 @@ class Client:
 
     def request(self, body):
         client_sock = self.create_socket()
-        client_sock.connect((self.host_name, self.port))
+        client_sock.connect(self.address)
 
         self.protacol.write(client_sock, body)
         respons = self.protacol.read(client_sock)

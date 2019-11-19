@@ -5,7 +5,7 @@ import time
 class Server:
     def __init__(self, port, protacol, logger=print):
         self.logger = logger
-        self.port = port
+        self.address = ('', port)
         self.protacol = protacol 
 
     #def __del__(self):
@@ -13,21 +13,21 @@ class Server:
 
 
     def run_server(self):
-        self.serv_sock = self.create_server_sock(self.port)
+        self.serv_sock = self.create_server_sock(self.address)
         cid = 0
         while True:
             client_sock = self.accept_client_conn(self.serv_sock, cid)
             self.server_client(client_sock, cid)
             cid += 1
 
-    def create_server_sock(self, server_port):
+    def create_server_sock(self, address):
         serv_sock = socket.socket(socket.AF_INET,
                                   socket.SOCK_STREAM,
                                   proto=0)
-        serv_sock.bind(('', server_port))
+        serv_sock.bind(address)
         serv_sock.listen()
 
-        self.logger(f'Server running on port {server_port}')
+        self.logger(f'Server running on address {address}')
 
         return serv_sock
 
