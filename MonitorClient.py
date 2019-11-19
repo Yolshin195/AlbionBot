@@ -1,21 +1,35 @@
-import cv2 as cv
-import numpy
-
-import socket
+from Protacol import Protacol
+from Client import Client
 import time
 
-from Protacol import Protacol
+class MonitorClient(Client):
+    def getImg(self):
+        start = time.time()
+
+        client_sock = self.create_socket()
+
+        self.protacol.write(client_sock, '<getimg/>')
+        img = self.protacol.read(client_sock)
+
+        client_sock.close()
+
+        self.logger(f'Get img time: {time.time() - start}')
+        return img
 
 
 if __name__ == '__main__':
+    import cv2 as cv
+    import numpy
+
+
     protacol = Protacol(10)
+    monitorClient = MonitorClient('localhost', 4001, protacol)
 
-    client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_sock.connect(('127.0.0.1', 4000))
-    protacol.write(client_sock, '<get><img></img></get>')
-    data = protacol.read(client_sock)
-    client_sock.close()
+    while True:
+        data = monitorClient.getImg()
 
-    cv.imshow('Monitor clietn', data)
-    cv.waitKey(0)
-    print('Received', repr(data))
+        cv.imshow('Monitor clietn', data)
+        if cv.waitKey(25) & 0xFF == ord('q'):
+            cv.destroyAllWindows()
+            break
+
