@@ -38,24 +38,27 @@ class Server:
         return client_sock
 
     def server_client(self, client_sock, cid):
-        request = self.read_request(client_sock)
+        start = time.time()
+
+        request = self.read_request(client_sock, cid)
         if request is None:
             self.logger(f'Client #{cid} unexpectedly disconnected')
         else:
             response = self.handle_request(request)
             self.write_response(client_sock, response, cid)
+            self.logger(f'Client #{cid} has been served. '
+                        f'time: {time.time() - start}')
 
-    def read_request(self, client_sock):
-        return self.protacol.read(client_sock)
+    def read_request(self, client_sock, cid):
+        return self.protacol.read(client_sock, cid)
 
     def handle_request(self, request):
         time.sleep(5)
         return request[::-1]
 
     def write_response(self, client_sock, response, cid):
-        self.protacol.write(client_sock, response)
+        self.protacol.write(client_sock, response, cid)
         client_sock.close()
-        self.logger(f'Client #{cid} has been served')
 
 
 if __name__== '__main__':

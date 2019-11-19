@@ -1,34 +1,35 @@
 from lib.Client import Client
-import time
 
 class ControlClient(Client):
     def getSizeMonitor(self):
-        start = time.time()
+        response = self.request({'action': 'getsize'},1)
 
-        response = self.request({'action': 'getsize'})
-
-        self.logger(f'Get img time: {time.time() - start}')
         return response 
 
     def moveTo(self, x, y, s):
-        start = time.time()
-
         response = self.request({'action': 'moveto',
-            'x': x, 'y': y, 'time': s })
+            'x': x, 'y': y, 'time': s }, 2)
 
-        self.logger(f'Get img time: {time.time() - start}')
         return response 
 
 
 if __name__ == '__main__':
     from lib.Protacol import Protacol
 
-    protacol = Protacol(10)
+    protacol = Protacol(10, lambda log: None)
     controlClient = ControlClient('localhost', 4002, protacol)
 
     sizeMonitor = controlClient.getSizeMonitor()
-    print(sizeMonitor) 
+    print(sizeMonitor)
 
-    moveTo = controlClient.moveTo(100, 100, 10)
+    arrayMoveTo = controlClient.request([
+        {'action': 'moveto', 'x': 100, 'y': 100, 'time': 1 },
+        {'action': 'moveto', 'x': 300, 'y': 100, 'time': 1 },
+        {'action': 'moveto', 'x': 300, 'y': 300, 'time': 1 },
+        {'action': 'moveto', 'x': 100, 'y': 300, 'time': 1 }
+        ])
+    print(arrayMoveTo)
+
+    moveTo = controlClient.moveTo(100, 100, 1)
     print(moveTo) 
 

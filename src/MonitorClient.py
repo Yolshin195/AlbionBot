@@ -3,11 +3,8 @@ import time
 
 class MonitorClient(Client):
     def getImg(self):
-        start = time.time()
-
         img = self.request('<getimg/>')
 
-        self.logger(f'Get img time: {time.time() - start}')
         return img
 
 

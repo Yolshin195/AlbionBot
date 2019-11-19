@@ -6,15 +6,17 @@ class Protacol:
         self.header_size = header_size
         self.logger = logger
 
-    def write(self, sock, response):
+    def write(self, sock, response, cid=0):
         response = pickle.dumps(response)
         response = gzip.compress(response)
 
         response_size = bytes(
             f'{len(response):<{self.header_size}}', 'utf-8')
+        self.logger(f'Client #{cid} write body size '
+                    f'{response_size}')
         sock.sendall(response_size + response)
 
-    def read(self, sock):
+    def read(self, sock,  cid=0):
         response = bytearray()
         try:
             response_size = sock.recv(self.header_size)
@@ -30,6 +32,8 @@ class Protacol:
                     return None
                 response += chunk
                 if len(response) == response_size:
+                    self.logger(f'Client #{cid} read body size '
+                                f'{response_size}')
                     response = gzip.decompress(response)
                     response = pickle.loads(response)
                     return response 
