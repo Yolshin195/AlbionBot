@@ -6,8 +6,6 @@ class ControlServer(Server):
         self.logger(f'handler_request begin')
         response = bytearray()
 
-
-
         self.logger(f'handler_request end')
         return response
 

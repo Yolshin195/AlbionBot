@@ -1,26 +1,20 @@
-from Protacol import Protacol
-from Client import Client
+from lib.Client import Client
 import time
 
 class MonitorClient(Client):
     def getImg(self):
         start = time.time()
 
-        client_sock = self.create_socket()
-
-        self.protacol.write(client_sock, '<getimg/>')
-        img = self.protacol.read(client_sock)
-
-        client_sock.close()
+        img = self.request('<getimg/>')
 
         self.logger(f'Get img time: {time.time() - start}')
         return img
 
 
 if __name__ == '__main__':
+    from lib.Protacol import Protacol
     import cv2 as cv
     import numpy
-
 
     protacol = Protacol(10)
     monitorClient = MonitorClient('localhost', 4001, protacol)
